@@ -25,4 +25,9 @@ public class CurrencyConversionController {
     public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to, @PathVariable BigDecimal quantity) {
         return currencyConversionService.calculateCurrencyConversion(from, to, quantity);
     }
+
+    @GetMapping("/feign/from/{from}/to/{to}/quantity/{quantity}")
+    public CurrencyConversion calculateCurrencyConversionFeign(@PathVariable String from, @PathVariable String to, @PathVariable BigDecimal quantity) {
+        return currencyConversionService.calculateCurrencyConversionFeign(from, to, quantity);
+    }
 }
