@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.microservices.currencyexchangeservice.model.CurrencyExchange;
 import com.microservices.currencyexchangeservice.model.dto.CreateCurrencyExchangeDto;
 import com.microservices.currencyexchangeservice.service.CurrencyExchangeService;
+
+import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
 @RequestMapping("/api/v1/currency-exchange")
@@ -28,6 +31,7 @@ public class CurrencyExchangeController {
     }
     
     @GetMapping("/from/{from}/to/{to}")
+    @Retry(name = "retrieve-value-api", fallbackMethod = "hardcodedResponse")
     public CurrencyExchange retrieveExchangeValue(@PathVariable String from, @PathVariable String to) throws NotFoundException {
         return currencyExchangeService.getCurrencyExchange(from, to);
     }
@@ -35,5 +39,9 @@ public class CurrencyExchangeController {
     @PostMapping("")
     public CurrencyExchange createExchangeValue(@RequestBody CreateCurrencyExchangeDto createCurrencyExchangeDto) throws NotFoundException {
         return currencyExchangeService.createCurrencyExchange(createCurrencyExchangeDto);
+    }
+
+    public CurrencyExchange hardcodedResponse(Exception ex) {
+        return new CurrencyExchange();
     }
 }
