@@ -17,7 +17,9 @@ import com.microservices.currencyexchangeservice.model.CurrencyExchange;
 import com.microservices.currencyexchangeservice.model.dto.CreateCurrencyExchangeDto;
 import com.microservices.currencyexchangeservice.service.CurrencyExchangeService;
 
-import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
 @RequestMapping("/api/v1/currency-exchange")
@@ -31,7 +33,9 @@ public class CurrencyExchangeController {
     }
     
     @GetMapping("/from/{from}/to/{to}")
-    @Retry(name = "retrieve-value-api", fallbackMethod = "hardcodedResponse")
+    //@CircuitBreaker(name = "retrieve-value-api", fallbackMethod = "hardcodedResponse")
+    @RateLimiter(name = "default")
+    @Bulkhead(name= "default")
     public CurrencyExchange retrieveExchangeValue(@PathVariable String from, @PathVariable String to) throws NotFoundException {
         return currencyExchangeService.getCurrencyExchange(from, to);
     }
